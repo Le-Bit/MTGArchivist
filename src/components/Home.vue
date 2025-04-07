@@ -25,7 +25,14 @@
       justify="center"
       class="ma-4"
     >
-      <v-list :items="cards.map(e => e.name)" />
+      <v-list>
+        <v-list-item
+          v-for="(cardItem, index) in cards"
+          :key="index"
+        >
+          {{ cardItem.name }}
+        </v-list-item>
+      </v-list>
       <v-col v-if="showImage">
         <v-container
           max-width="300"
@@ -44,18 +51,6 @@
             max-width="300"
             color="blue"
           />
-          <!-- <v-overlay
-            v-model="showImage"
-            contained
-          >
-            <v-btn
-              variant="flat"
-              color="red"
-              @click="showImage = false"
-            >
-              NO
-            </v-btn>
-          </v-overlay> -->
         </v-container>
       </v-col>
     </v-row>
