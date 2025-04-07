@@ -9,12 +9,8 @@
         />
       </v-col>
       <v-col>
-        <v-text-field
+        <v-number-input
           v-model="collectorNumber"
-          label="Search"
-          outlined
-          clearable
-          append-icon="mdi-magnify"
           @keyup.enter="onSearch"
           @click:append="onSearch"
         />
@@ -25,15 +21,40 @@
       justify="center"
       class="ma-4"
     >
-      <v-list>
-        <v-list-item
-          v-for="(cardItem, index) in cards"
-          :key="index"
-        >
-          {{ cardItem.name }}
-        </v-list-item>
-      </v-list>
-      <v-col v-if="showImage">
+      <v-col cols="4">
+        <v-list>
+          <v-list-item
+            v-for="(cardItem, index) in cards"
+            :key="index"
+          >
+            <v-tooltip
+              location="top"
+              origin="auto"
+              no-click-animation
+            >
+              <template #activator="{ props }">
+                <v-list-item-title v-bind="props">
+                  {{ cardItem.name }}
+                </v-list-item-title>
+              </template>
+
+              <div>
+                <v-img
+                  align="center"
+                  justify="center"
+                  :src="cardItem.image_uris?.normal"
+                  :alt="cardItem.name"
+                  min-width="200"
+                />
+              </div>
+            </v-tooltip>
+          </v-list-item>
+        </v-list>
+      </v-col>
+      <v-col
+        v-if="showImage"
+        cols="4"
+      >
         <v-container
           max-width="300"
           style="position: relative;"
@@ -53,12 +74,37 @@
           />
         </v-container>
       </v-col>
+      <v-col
+        v-if="!showImage"
+        cols="4"
+      >
+        <v-container
+          max-width="300"
+          style="position: relative;"
+          @click="addToCards()"
+        >
+          <v-img
+            align="center"
+            justify="center"
+            src="https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/f/f8/Magic_card_back.jpg"
+            :alt="card.name"
+          />
+          <v-progress-linear
+            :model-value="progress"
+            height="4"
+            max-width="300"
+            color="blue"
+          />
+        </v-container>
+      </v-col>
+      <v-col cols="4">
+        <v-fab
+          color="primary"
+          icon="$vuetify"
+          @click="downloadList()"
+        />
+      </v-col>
     </v-row>
-    <v-fab
-      color="primary"
-      icon="$vuetify"
-      @click="downloadList()"
-    />
   </v-container>
 </template>
 
@@ -75,7 +121,7 @@ onUnmounted(() => {
 });
 
 
-const collectorNumber = ref('3' as unknown as number);
+const collectorNumber = ref(3 as number | undefined);
 const sets = ref([] as unknown as Set[]);
 const selectedSet = ref('FDN' as string);
 
@@ -104,14 +150,14 @@ function handleGlobalKeydown(event: KeyboardEvent) {
   if (event.key === 'Enter' && showImage.value === true) {
     addToCards();
     setTimeout(() => searchBar.value.focus(), 100);
-    collectorNumber.value =  '' as unknown as number;
+    collectorNumber.value = undefined;
   }
   if (event.key === 'Backspace' && showImage.value === true) {
     showImage.value = false;
     progress.value = 0;
     clearInterval(interval);
     setTimeout(() => searchBar.value.focus(), 100);
-    collectorNumber.value =  '' as unknown as number;
+    collectorNumber.value =  undefined;
   }
 }
 
@@ -138,8 +184,13 @@ const ids = cards.value.map((card) => card.id);
 
 function onSearch() {
   searchBar.value = document.activeElement as HTMLElement;
+
   if (searchBar.value) {
     searchBar.value.blur();
+  }
+
+  if (collectorNumber.value === undefined) {
+    return;
   }
 
   Cards.bySet(selectedSet.value, collectorNumber.value)
