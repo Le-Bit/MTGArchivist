@@ -121,9 +121,9 @@ onUnmounted(() => {
 });
 
 
-const collectorNumber = ref(3 as number | undefined);
+const collectorNumber = ref(undefined as number | undefined);
 const sets = ref([] as unknown as Set[]);
-const selectedSet = ref('FDN' as string);
+const selectedSet = ref('' as string);
 
 const setsName = ref([] as string[]);
 const card = ref('' as unknown as Card);
