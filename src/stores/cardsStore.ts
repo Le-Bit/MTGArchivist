@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { Cards, type Card } from "scryfall-api";
-import { acceleratedEasing } from "vuetify/lib/util/easing.mjs";
 
 export const useCardsStore = defineStore("cards", () => {
   const showingCard = ref<Card | undefined>(undefined);
@@ -28,6 +27,12 @@ export const useCardsStore = defineStore("cards", () => {
   const getLang = computed(() => {
     return ["en", "fr"];
   });
+
+  const cardsCount = computed(() =>
+    savedCardsWithMetadata.value.reduce((acc, curr) => {
+      return acc + curr.quantity;
+    }, 0)
+  );
 
   const getSavedCardsWithMetadata = computed(() => {
     return savedCardsWithMetadata;
@@ -138,9 +143,9 @@ export const useCardsStore = defineStore("cards", () => {
         }
         setShowingCard(response);
         progress.value = TIME_OUT / PROGRESS_INTERVAL;
-        const length = savedCardsWithMetadata.value.length;
+        const length = cardsCount.value;
         interval.value = setInterval(() => {
-          if (savedCardsWithMetadata.value.length > length) {
+          if (cardsCount.value > length) {
             clearInterval(interval.value);
             progress.value = 0;
             showingCard.value = undefined;
