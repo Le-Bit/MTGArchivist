@@ -12,7 +12,7 @@
         <v-img
           align="center"
           justify="center"
-          :src="getShowingCard?.image_uris?.normal"
+          :src="getShowingCard?.image_uris?.normal ?? getShowingCard.card_faces?.['0'].image_uris?.normal"
           :alt="getShowingCard?.name"
         />
         <v-progress-linear
