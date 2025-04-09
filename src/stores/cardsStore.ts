@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { Cards, type Card } from "scryfall-api";
+import { acceleratedEasing } from "vuetify/lib/util/easing.mjs";
 
 export const useCardsStore = defineStore("cards", () => {
   const showingCard = ref<Card | undefined>(undefined);

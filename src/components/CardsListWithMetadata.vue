@@ -3,7 +3,10 @@
     <v-list-item>
       <v-list-item-title class="d-flex align-center justify-space-between">
         <span>
-          Cards saved
+          Cards saved: {{ savedCardsWithMetadata.reduce((acc, curr) => {
+            return acc + curr.quantity;
+          }, 0)
+          }} 
         </span>
         <span>
           <download-cards-list />
@@ -57,8 +60,8 @@
 import { useCardsStore } from "../stores/cardsStore";
 
 const cardsStore = useCardsStore();
-const {savedCardsWithMetadata} = toRefs(cardsStore);
-const {initCards, saveCards , onQuantityChange} = cardsStore;
+const {savedCardsWithMetadata } = toRefs(cardsStore);
+const {initCards, saveCards , onQuantityChange } = cardsStore;
 
 onMounted(() => {
   initCards();
