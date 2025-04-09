@@ -181,5 +181,6 @@ export const useCardsStore = defineStore("cards", () => {
     selectedLang,
     getLang,
     onQuantityChange,
+    cardsCount,
   };
 });
