@@ -14,7 +14,7 @@
       v-for="(cardItem, index) in savedCardsWithMetadata"
       :key="index"
     >
-      <v-list-item-title >
+      <v-list-item-title>
         <v-row class="d-flex align-center justify-space-between">
           <v-col cols="9">
             <span>
@@ -33,7 +33,7 @@
                 variant="outlined"
                 hide-details
                 hide-input
-                :onchange="saveCards()"
+                :onchange="onQuantityChange(cardItem.quantity, index)"
               />
             </span>
           </v-col>
@@ -58,7 +58,7 @@ import { useCardsStore } from "../stores/cardsStore";
 
 const cardsStore = useCardsStore();
 const {savedCardsWithMetadata} = toRefs(cardsStore);
-const {initCards, saveCards} = cardsStore;
+const {initCards, saveCards , onQuantityChange} = cardsStore;
 
 onMounted(() => {
   initCards();

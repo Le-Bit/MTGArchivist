@@ -3,7 +3,6 @@ import { Cards, type Card } from "scryfall-api";
 
 export const useCardsStore = defineStore("cards", () => {
   const showingCard = ref<Card | undefined>(undefined);
-  const savedCards = ref<Card[]>([]);
   const savedCardsWithMetadata = ref<
     {
       card: Card;
@@ -27,10 +26,6 @@ export const useCardsStore = defineStore("cards", () => {
 
   const getLang = computed(() => {
     return ["en", "fr"];
-  });
-
-  const getSavedCards = computed(() => {
-    return savedCards;
   });
 
   const getSavedCardsWithMetadata = computed(() => {
@@ -61,7 +56,6 @@ export const useCardsStore = defineStore("cards", () => {
       console.error("No card to save");
       return;
     }
-    savedCards.value.push(showingCard.value);
     console.log("pushed");
     const savedCardIndex = savedCardsWithMetadata.value.findIndex(
       (card) => card.card.id === showingCard.value?.id
@@ -76,17 +70,22 @@ export const useCardsStore = defineStore("cards", () => {
         foil: false,
       });
     }
-    console.log("Saved card:", savedCards.value);
+    console.log("Saved card:", savedCardsWithMetadata.value);
     showingCard.value = undefined;
     collectorNumber.value = undefined;
     saveCards();
   }
 
   function saveCards() {
-    savedCardsWithMetadata.value = savedCardsWithMetadata.value.filter(
-      (card) => card.quantity > 0
-    );
     localStorage.setItem("cards", JSON.stringify(savedCardsWithMetadata.value));
+  }
+
+  function onQuantityChange(quantity: number, index: number) {
+    const card = savedCardsWithMetadata.value[index];
+    card.quantity = quantity;
+    if (quantity === 0) {
+      savedCardsWithMetadata.value.splice(index, 1);
+    }
   }
 
   function dismissCards() {
@@ -138,9 +137,9 @@ export const useCardsStore = defineStore("cards", () => {
         }
         setShowingCard(response);
         progress.value = TIME_OUT / PROGRESS_INTERVAL;
-        const length = savedCards.value.length;
+        const length = savedCardsWithMetadata.value.length;
         interval.value = setInterval(() => {
-          if (savedCards.value.length > length) {
+          if (savedCardsWithMetadata.value.length > length) {
             clearInterval(interval.value);
             progress.value = 0;
             showingCard.value = undefined;
@@ -166,7 +165,6 @@ export const useCardsStore = defineStore("cards", () => {
     saveCard,
     getProgress,
     getShowingCard,
-    getSavedCards,
     getSavedCardsWithMetadata,
     savedCardsWithMetadata,
     dismissCards,
@@ -176,5 +174,6 @@ export const useCardsStore = defineStore("cards", () => {
     saveCards,
     selectedLang,
     getLang,
+    onQuantityChange,
   };
 });

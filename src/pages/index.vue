@@ -4,21 +4,23 @@
       <v-col cols="6">
         <CardsListWithMetadata />
       </v-col>
-      <v-col cols="2">
-        <LangSelector />
-      </v-col>
-      <v-col cols="2">
-        <SetCodeSelector />
-      </v-col>
-      <v-col cols="2">
-        <CollectorNumberSelector />
-      </v-col>
-    </v-row>
-    <v-row>
       <v-col cols="6">
-      </v-col>
-      <v-col cols="6">
-        <CardDisplay />
+        <v-row>
+          <v-col cols="4">
+            <LangSelector />
+          </v-col>
+          <v-col cols="3">
+            <SetCodeSelector />
+          </v-col>
+          <v-col cols="4">
+            <CollectorNumberSelector />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <CardDisplay />
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </v-container>

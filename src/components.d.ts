@@ -8,7 +8,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     CardDisplay: typeof import('./components/CardDisplay.vue')['default']
-    CardsList: typeof import('./components/CardsList.vue')['default']
     CardsListWithMetadata: typeof import('./components/CardsListWithMetadata.vue')['default']
     CollectorNumberSelector: typeof import('./components/CollectorNumberSelector.vue')['default']
     DownloadCardsList: typeof import('./components/DownloadCardsList.vue')['default']

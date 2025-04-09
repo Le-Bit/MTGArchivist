@@ -1,11 +1,11 @@
 <template>
   <v-container>
     <v-btn
-        color="primary"
+      color="primary"
       @click="downloadList()"
     >
       DOWNLOAD
-      </v-btn>
+    </v-btn>
   </v-container>
 </template>
 
