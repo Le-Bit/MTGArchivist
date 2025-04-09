@@ -2,224 +2,52 @@
   <v-container>
     <v-row justify="center">
       <v-col>
-        <v-select
-          v-model="selectedSet"
-          label="Set code"
-          :items="setsName"
-        />
+        <SetCodeSelector />
       </v-col>
       <v-col>
-        <v-number-input
-          v-model="collectorNumber"
-          label="Collector number"
-          @keyup.enter="onSearch"
-          @click:append="onSearch"
-        />
+        <CollectorNumberSelector />
       </v-col>
     </v-row>
-    <v-row
-      align="center"
-      justify="center"
-      class="ma-4"
-    >
+    <v-row>
       <v-col cols="4">
-        <v-list>
-          <v-list-item
-            v-for="(cardItem, index) in cards"
-            :key="index"
-          >
-            <v-tooltip
-              location="top"
-              origin="auto"
-              no-click-animation
-            >
-              <template #activator="{ props }">
-                <v-list-item-title v-bind="props">
-                  {{ cardItem.name }}
-                </v-list-item-title>
-              </template>
-
-              <div>
-                <v-img
-                  align="center"
-                  justify="center"
-                  :src="cardItem.image_uris?.normal"
-                  :alt="cardItem.name"
-                  min-width="200"
-                />
-              </div>
-            </v-tooltip>
-          </v-list-item>
-        </v-list>
-      </v-col>
-      <v-col
-        v-if="showImage"
-        cols="4"
-      >
-        <v-container
-          max-width="300"
-          style="position: relative;"
-          @click="addToCards()"
-        >
-          <v-img
-            align="center"
-            justify="center"
-            :src="card.image_uris?.normal"
-            :alt="card.name"
-          />
-          <v-progress-linear
-            :model-value="progress"
-            height="4"
-            max-width="300"
-            color="blue"
-          />
-        </v-container>
-      </v-col>
-      <v-col
-        v-if="!showImage"
-        cols="4"
-      >
-        <v-container
-          max-width="300"
-          style="position: relative;"
-          @click="addToCards()"
-        >
-          <v-img
-            align="center"
-            justify="center"
-            src="https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/f/f8/Magic_card_back.jpg"
-            :alt="card.name"
-          />
-          <v-progress-linear
-            :model-value="progress"
-            height="4"
-            max-width="300"
-            color="blue"
-          />
-        </v-container>
+        <CardsList />
       </v-col>
       <v-col cols="4">
-        <v-fab
-          color="primary"
-          icon="$vuetify"
-          @click="downloadList()"
-        />
+        <CardDisplay />
+      </v-col>
+      <v-col cols="4">
+        <DownloadCardsList />
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Sets, type Set, Cards, type Card } from "scryfall-api";
+import { useCardsStore } from "../stores/cardsStore";
+const cardsStore = useCardsStore();
+const {addToSavedCards, dismissCards, getShowingCard } = cardsStore;
+let collectorNumberSelector = null
 
 onMounted(() => {
-  window.addEventListener('keydown', handleGlobalKeydown);
+  window.addEventListener("keydown", handleGlobalKeydown);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleGlobalKeydown);
+  window.removeEventListener("keydown", handleGlobalKeydown);
 });
 
 
-const collectorNumber = ref(undefined as number | undefined);
-const sets = ref([] as Set[]);
-const selectedSet = ref('' as string);
-
-const setsName = ref([] as string[]);
-const card = ref({} as Card);
-const cards = ref([] as Card[]);
-const showImage = ref(false);
-const progress = ref(0);
-const TIME_OUT = 5000;
-const INTERVAL_VALUE = 100;
-const PROGRESS_INTERVAL = TIME_OUT / 100
-const searchBar = ref({} as HTMLElement);
-let interval: number = 0;
-
-Sets.all()
-  .then((response) => {
-    console.log("Response:", response);
-    sets.value = response;
-    setsName.value = response.map((set) => set.code.toUpperCase());
-  })
-  .catch((error) => {
-    console.error("Error fetching sets:", error);
-  });
-
 function handleGlobalKeydown(event: KeyboardEvent) {
-  if (event.key === 'Enter' && showImage.value === true) {
-    addToCards();
-    setTimeout(() => searchBar.value.focus(), 100);
-    collectorNumber.value = undefined;
+  collectorNumberSelector = document.activeElement;
+    if (collectorNumberSelector && (collectorNumberSelector.tagName === "INPUT" || collectorNumberSelector.tagName === "TEXTAREA")) {
+     return; 
+    }
+  if (event.key === "Enter" && !!getShowingCard) {
+    addToSavedCards(); 
   }
-  if (event.key === 'Backspace' && showImage.value === true) {
-    showImage.value = false;
-    progress.value = 0;
-    clearInterval(interval);
-    setTimeout(() => searchBar.value.focus(), 100);
-    collectorNumber.value =  undefined;
+  if (event.key === "Backspace" && !!getShowingCard) {
+    dismissCards();
   }
 }
 
-function addToCards() {
-  showImage.value = false;
-  progress.value = 0;
-  clearInterval(interval);
-  cards.value.push(card.value);
-}
-
-function downloadList() {
-const ids = cards.value.map((card) => card.id);
-
-  const blob = new Blob(['ScryfallIds,\n' + ids.join(',\n')], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'cards.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function onSearch() {
-  searchBar.value = document.activeElement as HTMLElement;
-  if (searchBar.value) {
-    searchBar.value.blur();
-  }
-
-  if (collectorNumber.value === undefined) {
-    return;
-  }
-
-  Cards.bySet(selectedSet.value, collectorNumber.value)
-    .then((response) => {
-      if (response === undefined) {
-        return;
-      }
-      card.value = response;
-      showImage.value = true;
-      progress.value = TIME_OUT / PROGRESS_INTERVAL;
-      const length = cards.value.length
-      interval = setInterval(() => {
-        if (cards.value.length > length) {
-          clearInterval(interval);
-          progress.value = 0;
-          showImage.value = false;
-          return;
-        }
-        progress.value -= INTERVAL_VALUE / PROGRESS_INTERVAL;
-        if (progress.value <= 0) {
-          clearInterval(interval);
-          if (showImage.value === true) {
-            addToCards();
-          }
-        }
-      }, INTERVAL_VALUE);
-    })
-    .catch((error) => {
-      console.error("Error fetching search results:", error);
-    });
-}
 </script>
