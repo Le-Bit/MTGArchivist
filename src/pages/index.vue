@@ -1,28 +1,31 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <v-col>
+      <v-col cols="6">
+        <CardsListWithMetadata />
+      </v-col>
+      <v-col cols="2">
+        <LangSelector />
+      </v-col>
+      <v-col cols="2">
         <SetCodeSelector />
       </v-col>
-      <v-col>
+      <v-col cols="2">
         <CollectorNumberSelector />
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="4">
-        <CardsList />
+      <v-col cols="6">
       </v-col>
-      <v-col cols="4">
+      <v-col cols="6">
         <CardDisplay />
-      </v-col>
-      <v-col cols="4">
-        <DownloadCardsList />
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
+import LangSelector from "../components/LangSelector.vue";
 import { useCardsStore } from "../stores/cardsStore";
 const cardsStore = useCardsStore();
 const {addToSavedCards, dismissCards, getShowingCard } = cardsStore;

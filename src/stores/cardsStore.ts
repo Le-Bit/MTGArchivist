@@ -4,6 +4,13 @@ import { Cards, type Card } from "scryfall-api";
 export const useCardsStore = defineStore("cards", () => {
   const showingCard = ref<Card | undefined>(undefined);
   const savedCards = ref<Card[]>([]);
+  const savedCardsWithMetadata = ref<
+    {
+      card: Card;
+      quantity: number;
+      foil: boolean;
+    }[]
+  >([]);
   const dismissedCards = ref<Card[]>([]);
   const progress = ref(0);
   const TIME_OUT = 5000;
@@ -11,19 +18,42 @@ export const useCardsStore = defineStore("cards", () => {
   const PROGRESS_INTERVAL = TIME_OUT / 100;
   const interval = ref(0);
   const searchBar = ref({} as HTMLElement | null);
+  const selectedLang = ref("en");
   const collectorNumber = ref(undefined as number | undefined);
 
   const getProgress = computed(() => {
     return progress;
   });
 
+  const getLang = computed(() => {
+    return ["en", "fr"];
+  });
+
   const getSavedCards = computed(() => {
     return savedCards;
+  });
+
+  const getSavedCardsWithMetadata = computed(() => {
+    return savedCardsWithMetadata;
   });
 
   const getShowingCard = computed(() => {
     return showingCard;
   });
+
+  function initCards() {
+    const cards = localStorage.getItem("cards");
+    if (cards) {
+      savedCardsWithMetadata.value = JSON.parse(cards);
+    }
+  }
+
+  function resetCardsWithMetadata() {
+    console.log("resetting");
+    savedCardsWithMetadata.value = [];
+    localStorage.setItem("cards", JSON.stringify([]));
+    console.log("resetted");
+  }
 
   function addToSavedCards() {
     setTimeout(() => searchBar.value?.focus(), 100);
@@ -32,9 +62,31 @@ export const useCardsStore = defineStore("cards", () => {
       return;
     }
     savedCards.value.push(showingCard.value);
-    showingCard.value = undefined;
+    console.log("pushed");
+    const savedCardIndex = savedCardsWithMetadata.value.findIndex(
+      (card) => card.card.id === showingCard.value?.id
+    );
+    if (savedCardIndex !== -1) {
+      savedCardsWithMetadata.value[savedCardIndex].quantity++;
+      console.log("incremented");
+    } else {
+      savedCardsWithMetadata.value.push({
+        card: showingCard.value,
+        quantity: 1,
+        foil: false,
+      });
+    }
     console.log("Saved card:", savedCards.value);
+    showingCard.value = undefined;
     collectorNumber.value = undefined;
+    saveCards();
+  }
+
+  function saveCards() {
+    savedCardsWithMetadata.value = savedCardsWithMetadata.value.filter(
+      (card) => card.quantity > 0
+    );
+    localStorage.setItem("cards", JSON.stringify(savedCardsWithMetadata.value));
   }
 
   function dismissCards() {
@@ -75,7 +127,11 @@ export const useCardsStore = defineStore("cards", () => {
       return;
     }
 
-    Cards.bySet(getSelectedSet.value.code, collectorNumber.value)
+    Cards.bySet(
+      getSelectedSet.value.code,
+      collectorNumber.value,
+      selectedLang.value
+    )
       .then((response) => {
         if (response === undefined) {
           return;
@@ -111,7 +167,14 @@ export const useCardsStore = defineStore("cards", () => {
     getProgress,
     getShowingCard,
     getSavedCards,
+    getSavedCardsWithMetadata,
+    savedCardsWithMetadata,
     dismissCards,
     collectorNumber,
+    initCards,
+    resetCardsWithMetadata,
+    saveCards,
+    selectedLang,
+    getLang,
   };
 });
