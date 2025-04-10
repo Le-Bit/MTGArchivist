@@ -17,27 +17,13 @@ const {getSavedCardsWithMetadata, resetCardsWithMetadata} = cardsStore;
 
 
 function downloadList() {
-  //Count	TradelistCount	Name	Edition	Condition	Language	Foil	Tags	LastModified	CollectorNumber	Alter	Proxy	PurchasePrice
   console.log(getSavedCardsWithMetadata.value);
-  // const ids = getSavedCardsWithMetadata.value.map((card) => card.card.id);
-   const str = 'Count,Name,Foil,Condition,ScryfallID\n';
+  const str = 'Count,lang,foil,ScryfallID\n';
   const cardList = getSavedCardsWithMetadata.value.map((card) => {
-  // const str = 'Count,Name,Edition,Condition,Language,Foil,CollectorNumber,ScryfallID\n';
-    // return [
-    //   card.quantity,
-    //   card.card.name,
-    //   card.card.set_name,
-    //   'NM',
-    //   card.card.lang,
-    //   card.foil ? "Foil" : "Non-Foil",
-    //   card.card.collector_number,
-    //   card.card.id,
-    // ].join(",");
     return [
       card.quantity,
-      card.card.name,
+      card.lang,
       card.foil ? "Foil" : "Non-Foil",
-      'NM',
       card.card.id,
     ].join(",");
   });

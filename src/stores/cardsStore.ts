@@ -8,6 +8,7 @@ export const useCardsStore = defineStore("cards", () => {
       card: Card;
       quantity: number;
       foil: boolean;
+      lang: string;
     }[]
   >([]);
   const dismissedCards = ref<Card[]>([]);
@@ -64,7 +65,9 @@ export const useCardsStore = defineStore("cards", () => {
     }
     console.log("pushed");
     const savedCardIndex = savedCardsWithMetadata.value.findIndex(
-      (card) => card.card.id === showingCard.value?.id
+      (card) =>
+        card.card.id === showingCard.value?.id &&
+        card.lang === selectedLang.value
     );
     if (savedCardIndex !== -1) {
       savedCardsWithMetadata.value[savedCardIndex].quantity++;
@@ -74,6 +77,7 @@ export const useCardsStore = defineStore("cards", () => {
         card: showingCard.value,
         quantity: 1,
         foil: false,
+        lang: selectedLang.value,
       });
     }
     console.log("Saved card:", savedCardsWithMetadata.value);
@@ -117,7 +121,7 @@ export const useCardsStore = defineStore("cards", () => {
     searchBar.value = element as HTMLElement;
   }
 
-  function saveCard(
+  async function saveCard(
     searchBarRef: Element | null,
     collectorNumber: Ref<number | undefined>,
     getSelectedSet: Ref<{ code: string }>
@@ -132,38 +136,47 @@ export const useCardsStore = defineStore("cards", () => {
       return;
     }
 
-    Cards.bySet(
+    const cardLocalized =
+      selectedLang.value !== "en"
+        ? await Cards.bySet(
+            getSelectedSet.value.code,
+            collectorNumber.value,
+            selectedLang.value
+          )
+        : undefined;
+
+    const scryfallCard = await Cards.bySet(
       getSelectedSet.value.code,
       collectorNumber.value,
-      selectedLang.value
-    )
-      .then((response) => {
-        if (response === undefined) {
-          return;
+      "en"
+    );
+
+    if (scryfallCard === undefined) {
+      return;
+    }
+
+    setShowingCard({
+      ...scryfallCard,
+      printed_name: cardLocalized?.printed_name ?? scryfallCard.name,
+    });
+    progress.value = TIME_OUT / PROGRESS_INTERVAL;
+    const length = cardsCount.value;
+    interval.value = setInterval(() => {
+      if (cardsCount.value > length) {
+        clearInterval(interval.value);
+        progress.value = 0;
+        showingCard.value = undefined;
+        return;
+      }
+      console.log(progress.value);
+      progress.value -= INTERVAL_VALUE / PROGRESS_INTERVAL;
+      if (progress.value <= 0) {
+        clearInterval(interval.value);
+        if (showingCard.value !== undefined) {
+          addToSavedCards();
         }
-        setShowingCard(response);
-        progress.value = TIME_OUT / PROGRESS_INTERVAL;
-        const length = cardsCount.value;
-        interval.value = setInterval(() => {
-          if (cardsCount.value > length) {
-            clearInterval(interval.value);
-            progress.value = 0;
-            showingCard.value = undefined;
-            return;
-          }
-          console.log(progress.value);
-          progress.value -= INTERVAL_VALUE / PROGRESS_INTERVAL;
-          if (progress.value <= 0) {
-            clearInterval(interval.value);
-            if (showingCard.value !== undefined) {
-              addToSavedCards();
-            }
-          }
-        }, INTERVAL_VALUE);
-      })
-      .catch((error) => {
-        console.error("Error fetching search results:", error);
-      });
+      }
+    }, INTERVAL_VALUE);
   }
 
   return {

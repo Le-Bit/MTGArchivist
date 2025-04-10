@@ -21,6 +21,10 @@ const {getSelectedSet} = setStore;
 
 
 function onSearch() {
-  saveCard(document.activeElement, collectorNumber, getSelectedSet)
+  saveCard(document.activeElement, collectorNumber, getSelectedSet).then(
+    () => {
+    console.log('Card searched');
+    }
+  );
 }
 </script>
