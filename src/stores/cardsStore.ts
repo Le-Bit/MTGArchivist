@@ -120,6 +120,31 @@ export const useCardsStore = defineStore("cards", () => {
   function setSearchBar(element: Element | null) {
     searchBar.value = element as HTMLElement;
   }
+  function setFoil(index: number) {
+    const card = savedCardsWithMetadata.value[index];
+    const cardAlreadySaved = savedCardsWithMetadata.value.find((c) => c.card.id === card.card.id && c.foil === !card.foil);
+
+    if (card.quantity === 1 && !cardAlreadySaved) {
+      card.foil = !card.foil;
+    }
+    else if (card.quantity === 1 && cardAlreadySaved) {
+      savedCardsWithMetadata.value.splice(index, 1);
+      const cardToRemove = savedCardsWithMetadata.value.find((c) => c.card.id === card.card.id && c.foil === !card.foil);
+      if (cardToRemove) {
+        cardToRemove.quantity++;
+      }
+    }
+    else {
+      const cardAlreadySaved = savedCardsWithMetadata.value.find((c) => c.card.id === card.card.id && c.foil === !card.foil);
+      card.quantity--;
+      if (cardAlreadySaved) {
+        cardAlreadySaved.quantity++;
+      }
+      else{
+      savedCardsWithMetadata.value.push({ ...card, foil: !card.foil , quantity: 1});
+      }
+    }
+  }
 
   async function saveCard(
     searchBarRef: Element | null,
@@ -195,5 +220,6 @@ export const useCardsStore = defineStore("cards", () => {
     getLang,
     onQuantityChange,
     cardsCount,
+    setFoil
   };
 });

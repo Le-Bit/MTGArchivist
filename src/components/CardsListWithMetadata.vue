@@ -43,7 +43,7 @@
                 small
                 :icon="cardItem.foil ? 'mdi-star' : 'mdi-star-outline'"
                 :onchange="saveCards()"
-                @click="cardItem.foil = !cardItem.foil"
+                @click="setFoil(index)"
               />
             </span>
           </v-col>
@@ -58,7 +58,7 @@ import { useCardsStore } from "../stores/cardsStore";
 
 const cardsStore = useCardsStore();
 const {savedCardsWithMetadata, cardsCount} = toRefs(cardsStore);
-const {initCards, saveCards , onQuantityChange } = cardsStore;
+const {initCards, saveCards , onQuantityChange, setFoil } = cardsStore;
 
 onMounted(() => {
   initCards();
