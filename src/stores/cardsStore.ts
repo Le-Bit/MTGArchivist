@@ -26,7 +26,26 @@ export const useCardsStore = defineStore("cards", () => {
   });
 
   const getLang = computed(() => {
-    return ["en", "fr"];
+    return [
+      "en",
+      "es",
+      "fr",
+      "de",
+      "it",
+      "pt",
+      "ja",
+      "ko",
+      "ru",
+      "zhs",
+      "zht",
+      "grc",
+      "qya",
+      "he",
+      "la",
+      "ar",
+      "sa",
+      "ph",
+      ];
   });
 
   const cardsCount = computed(() =>
