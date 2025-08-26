@@ -7,11 +7,12 @@
         </span>
         <span>
           <download-cards-list />
+          <download-deck-list />
         </span>
       </v-list-item-title>
     </v-list-item>
     <v-list-item
-      v-for="(cardItem, index) in savedCardsWithMetadata"
+      v-for="(cardItem, index) in savedCardsWithMetadata.reverse()"
       :key="index"
     >
       <v-list-item-title>
@@ -62,6 +63,7 @@ const {initCards, saveCards , onQuantityChange, setFoil } = cardsStore;
 
 onMounted(() => {
   initCards();
+  console.log(savedCardsWithMetadata.value)
 });
 
 

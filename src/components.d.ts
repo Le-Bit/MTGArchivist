@@ -11,6 +11,7 @@ declare module 'vue' {
     CardsListWithMetadata: typeof import('./components/CardsListWithMetadata.vue')['default']
     CollectorNumberSelector: typeof import('./components/CollectorNumberSelector.vue')['default']
     DownloadCardsList: typeof import('./components/DownloadCardsList.vue')['default']
+    DownloadDeckList: typeof import('./components/DownloadDeckList.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     LangSelector: typeof import('./components/LangSelector.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
