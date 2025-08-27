@@ -14,10 +14,13 @@
         <template #activator="{ props }">
           <v-list-item-title v-bind="props">
             <v-row class="d-flex align-center justify-space-between">
-              <v-col cols="9">
+              <v-col cols="8">
                 <span>
                   {{ cardItem.card.printed_name ?? cardItem.card.name }}
                 </span>
+              </v-col>
+              <v-col cols="1">
+                <span>{{ cardItem.lang }}</span>
               </v-col>
               <v-col cols="1">
                 <span>{{ cardItem.quantity }}</span>
