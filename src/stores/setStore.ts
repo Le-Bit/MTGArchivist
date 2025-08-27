@@ -26,7 +26,13 @@ export const useSetStore = defineStore("set", () => {
   });
 
   const getSets = computed(() => {
-    return sets;
+    return sets.value.map((set) => {
+      return {
+        title: set.code.toUpperCase(),
+        name: set.name,
+        img: set.icon_svg_uri,
+      }
+    });
   });
 
   const getSelectedSet = computed(() => {

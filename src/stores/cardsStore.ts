@@ -115,6 +115,7 @@ export const useCardsStore = defineStore("cards", () => {
     if (quantity === 0) {
       savedCardsWithMetadata.value.splice(index, 1);
     }
+    saveCards()
   }
 
   function dismissCards() {
