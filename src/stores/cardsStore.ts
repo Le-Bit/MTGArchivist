@@ -92,7 +92,7 @@ export const useCardsStore = defineStore("cards", () => {
       savedCardsWithMetadata.value[savedCardIndex].quantity++;
       console.log("incremented");
     } else {
-      savedCardsWithMetadata.value.push({
+      savedCardsWithMetadata.value.unshift({
         card: showingCard.value,
         quantity: 1,
         foil: false,
